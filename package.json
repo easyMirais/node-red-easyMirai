@@ -1,0 +1,32 @@
+{
+  "name": "node-red-easymirai",
+  "version": "1.0.0",
+  "description": "用图形编写MiraiBot",
+  "dependencies": {
+    "http": "^0.0.1-security",
+    "request": "^2.88.2"
+  },
+  "author": {
+    "name": "ExMikuPro",
+    "email": "sfnco-miku@outlook.com"
+  },
+  "license": "MIT",
+  "keywords": [
+    "node-red",
+    "http",
+    "request",
+  ],
+  "bugs": {
+    "url": "https://github.com/easyMrais/node-red-easyMirai/issues"
+  },
+  "homepage": "https://github.com/easyMrais/node-red-easyMirai/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/easyMrais/node-red-easyMirai.git"
+  },
+  "node-red": {
+    "nodes": {
+      "mirai": "easyMirai/easyMirai.js"
+    }
+  }
+}
