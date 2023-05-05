@@ -1,22 +1,22 @@
 <!--初始化函数-->
+<!--#5ccefa-->
 <script type="text/javascript">
     // 初始化函数
     RED.nodes.registerType('Mirai', {
         category: 'easyMirai',
-        color: '#FFAAAA',
-
+        color: '#f6a8b7',
         defaults: {
             name: {value: ""},
             miraiHost: {value: "http://127.0.0.1"},
-            miraiPort:{value:"8080"},
-            miraiKey:{value:""},
-            miraiId:{value:""},
-            miraiDebug:{value:true},
+            miraiPort: {value: "8080"},
+            miraiKey: {value: ""},
+            miraiId: {value: ""},
+            miraiDebug: {value: true},
             hashFieldType: {value: "msg"}
         },
         inputs: 0,
         outputs: 1,
-        outputLabels: "Mirai绑定参数(可选)",
+        outputLabels: "Mirai输出已绑定参数(可选)",
         icon: "md5.png",
         label: function () {
             return this.name || "Mirai";
@@ -25,11 +25,9 @@
 
         }
     });
-
-
 </script>
 
-<script type="text/x-red" data-template-name="Mirai">
+<script type="text/html" data-template-name="Mirai">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> 名称</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -56,14 +54,18 @@
     <br>
 
     <div class="form-row">
-        </i><input type="checkbox" id="node-input-miraiDebug" style="display: inline-block; width: auto; vertical-align: top;">
+        <input type="checkbox" id="node-input-miraiDebug" style="display: inline-block; width: auto; vertical-align: top;">
         <label for="node-input-miraiDebug" style="width: auto">启用日志输出(建议开发时开启)</label>
     </div>
+
+
 
 </script>
 
 <script type="text/x-red" data-help-name="Mirai">
     <p>初始化Mirai服务</p>
+
+
 
 </script>
 
@@ -73,7 +75,7 @@
     // 发送信息通信函数
     RED.nodes.registerType('Send', {
         category: 'easyMirai',
-        color: '#FFAAAA',
+        color: '#f6a8b7',
         defaults: {
             name: {value: ""},
         },
@@ -91,10 +93,163 @@
     </div>
     <div class="form-tips"><b>Tip:</b> This is here to help.</div>
 
+
+
 </script>
 
 <script type="text/x-red" data-help-name="Send">
    <p>发送信息函数</p>
+
+
+
+</script>
+
+
+<script type="text/javascript">
+    // 获取信息通信函数
+    RED.nodes.registerType('Get Message', {
+        category: 'easyMirai',
+        color: '#f6a8b7',
+        defaults: {
+            name: {value: ""},
+            getMode: {value: "count"},
+            count:{value: "1"}
+        },
+        icon: "md5.png",
+        inputs: 1,
+        outputs: 1,
+    });
+</script>
+
+<script type="text/html" data-template-name="Get Message">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> 名称</label>
+        <input type="text" id="node-input-name" placeholder="名称">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-getMode"><i class="fa fa-tasks"></i> 操作模式</label>
+        <select type="text" id="node-input-getMode" style="width:70%;">
+        <option value="count">获取队列大小</option>
+        <option value="fetch">获取队列头部</option>
+        <option value="fetchLatest">获取队列尾部</option>
+        <option value="peek">查看队列头部</option>
+        <option value="peekLatest">查看队列尾部</option>
+        <option value="getMode">输入msg.getMode定义</option>
+        </select>
+    </div>
+    <div class="form-tips">
+        <i class="fa fa-file"></i>
+        <b> 说明:</b> 各选项使用区别请参考帮助文档！
+    </div>
+    <br>
+    <div class="form-row">
+        <label for="node-input-miraiId"><i class="fa fa-tag"></i> 查看数量</label>
+        <input type="text" id="node-input-count" value="1">
+    </div>
+
+    <div class="form-tips">
+        <i class="fa fa-bell"></i>
+        <b> 注意:</b> 此选项如无特殊用途保持默认即可！
+    </div>
+
+
+
+</script>
+
+<script type="text/x-red" data-help-name="Get Message">
+   <p>发送信息函数</p>
+
+
+
+</script>
+
+
+<script type="text/javascript">
+    // 发送信息类型定义模块
+    RED.nodes.registerType('Text', {
+        category: 'easyMirai',
+        color: '#5ccefa',
+        defaults: {
+            name: {value: ""},
+            fieldToHash: {value: "payload"},
+            fieldTypeToHash: {value: "msg"},
+            hashField: {value: "md5"},
+            hashFieldType: {value: "msg"}
+        },
+        icon: "md5.png",
+        inputs: 1,
+        outputs: 1,
+        oneditprepare: function () {
+            if (!this.fieldTypeToHash) {
+                this.fieldTypeToHash = 'msg';
+            }
+            $("#node-input-fieldToHash").typedInput({
+                default: 'msg',
+                types: ['msg', 'flow', 'global'],
+                typeField: $("#node-input-fieldTypeToHash")
+            });
+            $("#node-input-useAuth").change(function () {
+                if ($(this).is(":checked")) {
+                    $(".node-input-useAuth-row").show();
+                } else {
+                    $(".node-input-useAuth-row").hide();
+                    $('#node-input-user').val('');
+                }
+            });
+            if (this.credentials.user) {
+                $('#node-input-useAuth').prop('checked', true);
+            } else {
+                $('#node-input-useAuth').prop('checked', false);
+            }
+            $("#node-input-useAuth").change();
+
+
+            $("#node-input-rule-container").css('min-height', '150px').css('min-width', '450px').editableList({})
+
+            // 这里
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="Text">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-fieldToHash"><i class="fa fa-edit"></i> Property to Hash</label>
+        <input type="text" id="node-input-fieldToHash" placeholder="Property to Hash" style="width:250px;">
+        <input type="hidden" id="node-input-fieldTypeToHash">
+        <div class="form-tips"><b>Tip:</b><br>ac<br>ab</div>
+    </div>
+
+    <div class="form-row">
+        <input type="checkbox" id="node-input-useAuth" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-input-useAuth" style="width: 70%;">转发消息</label>
+        <div style="margin-left: 20px" class="node-input-useAuth-row hide">
+            <div class="form-row">
+                <label for="node-input-user"><i class="fa fa-user"></i> 发送时转发给</span></label>
+                <!--转发目标-->
+                <input type="text" id="node-input-forward-user">
+            </div>
+            <div class="form-tips"><b><i class="fa fa-bell"></i> 说明:</b> 发送消息的时同时也给另一个人，这个人必须是机器人可以正常聊天的好友
+            </div>
+        </div>
+    </div>
+    <!--这里！-->
+    <div class="form-row node-input-rule-container-row">
+        <ol id="node-input-rule-container"></ol>
+    </div>
+
+
+</script>
+
+<script type="text/x-red" data-help-name="Text">
+   <p>发送信息函数</p>
+
+
 
 </script>
 
