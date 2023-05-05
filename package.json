@@ -10,11 +10,11 @@
     "name": "ExMikuPro",
     "email": "sfnco-miku@outlook.com"
   },
-  "license": "MIT",
+  "license": "AGPL-3.0",
   "keywords": [
     "node-red",
     "http",
-    "request",
+    "request"
   ],
   "bugs": {
     "url": "https://github.com/easyMrais/node-red-easyMirai/issues"
