@@ -7,7 +7,7 @@
         color: '#f6a8b7',
         defaults: {
             name: {value: ""},
-            miraiHost: {value: "http://127.0.0.1"},
+            miraiHost: {value: "127.0.0.1"},
             miraiPort: {value: "8080"},
             miraiKey: {value: ""},
             miraiId: {value: ""},
@@ -34,7 +34,7 @@
     </div>
     <div class="form-row">
         <label for="node-input-miraiHost"><i class="fa fa-globe"></i> Mirai地址</label>
-        <input type="text" id="node-input-miraiHost" placeholder="http://" style="width:45%;">
+        <input type="text" id="node-input-miraiHost" placeholder="127.0.0.1" style="width:45%;">
         <span>端口</span>
         <input type="text" id="node-input-miraiPort" style="width:80px;">
     </div>
@@ -54,10 +54,10 @@
     <br>
 
     <div class="form-row">
-        <input type="checkbox" id="node-input-miraiDebug" style="display: inline-block; width: auto; vertical-align: top;">
+        <input type="checkbox" id="node-input-miraiDebug"
+               style="display: inline-block; width: auto; vertical-align: top;">
         <label for="node-input-miraiDebug" style="width: auto">启用日志输出(建议开发时开启)</label>
     </div>
-
 
 
 </script>
@@ -67,38 +67,81 @@
 
 
 
+
+
+
+
+
+
 </script>
 
 <!--信息发送类-->
 
 <script type="text/javascript">
-    // 发送信息通信函数
-    RED.nodes.registerType('Send', {
+    // 获取信息通信函数
+    RED.nodes.registerType('Send Message', {
         category: 'easyMirai',
         color: '#f6a8b7',
         defaults: {
             name: {value: ""},
+            sendMode: {value: "old"},
+            count: {value: "1"},
+            forward: {value: ""},
+
         },
-        align: 'right',
         icon: "md5.png",
         inputs: 1,
         outputs: 1,
+        inputLabels: "输入消息队列",
+        outputLabels: "输出服务器返回值",
+        oneditprepare: function () {
+            $("#node-input-sendMode").on("change", function () {
+                if ($(this).val() === "new") {
+                    $(".form-row-sendMode").show();
+                } else {
+                    $(".form-row-sendMode").hide();
+                }
+            }).change();
+        }
     });
 </script>
 
-<script type="text/x-red" data-template-name="Send">
+<script type="text/html" data-template-name="Send Message">
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
+        <label for="node-input-name"><i class="fa fa-tag"></i> 名称</label>
+        <input type="text" id="node-input-name" placeholder="名称">
     </div>
-    <div class="form-tips"><b>Tip:</b> This is here to help.</div>
 
+    <div class="form-row">
+        <label for="node-input-getMode"><i class="fa fa-tasks"></i> 发送模式</label>
+        <select type="text" id="node-input-sendMode" style="width:70%;">
+            <option value="old">发给源消息群&好友</option>
+            <option value="new">指定发送群&好友</option>
+            <option value="sendMode">由msg.sendMode决定</option>
+        </select>
+    </div>
+
+    <div class="form-row form-row-sendMode hide">
+        <label for="node-input-forward"><i class="fa fa-external-link-square" aria-hidden="true"></i> 发送到</label>
+        <input type="text" id="node-input-forward" placeholder="账号&群ID">
+    </div>
+
+    <div class="form-tips form-row-sendMode hide">
+        <i class="fa fa-bell"></i>
+        <b> 注意:</b> 此选项会将所有消息转发给指定目标！使用前请确认该账号能正常向目标收发消息！
+    </div>
 
 
 </script>
 
-<script type="text/x-red" data-help-name="Send">
+<script type="text/x-red" data-help-name="Send Message">
    <p>发送信息函数</p>
+
+
+
+
+
+
 
 
 
@@ -113,7 +156,7 @@
         defaults: {
             name: {value: ""},
             getMode: {value: "count"},
-            count:{value: "1"}
+            count: {value: "1"}
         },
         icon: "md5.png",
         inputs: 1,
@@ -130,12 +173,12 @@
     <div class="form-row">
         <label for="node-input-getMode"><i class="fa fa-tasks"></i> 操作模式</label>
         <select type="text" id="node-input-getMode" style="width:70%;">
-        <option value="count">获取队列大小</option>
-        <option value="fetch">获取队列头部</option>
-        <option value="fetchLatest">获取队列尾部</option>
-        <option value="peek">查看队列头部</option>
-        <option value="peekLatest">查看队列尾部</option>
-        <option value="getMode">输入msg.getMode定义</option>
+            <option value="count">获取队列大小</option>
+            <option value="fetch">获取队列头部</option>
+            <option value="fetchLatest">获取队列尾部</option>
+            <option value="peek">查看队列头部</option>
+            <option value="peekLatest">查看队列尾部</option>
+            <option value="getMode">输入msg.getMode定义</option>
         </select>
     </div>
     <div class="form-tips">
@@ -154,11 +197,18 @@
     </div>
 
 
-
 </script>
 
 <script type="text/x-red" data-help-name="Get Message">
-   <p>发送信息函数</p>
+   <p>获取信息函数</p>
+
+
+
+
+
+
+
+
 
 
 
@@ -166,88 +216,129 @@
 
 
 <script type="text/javascript">
-    // 发送信息类型定义模块
-    RED.nodes.registerType('Text', {
+    // 获取信息通信函数
+    RED.nodes.registerType('Plan', {
         category: 'easyMirai',
         color: '#5ccefa',
         defaults: {
             name: {value: ""},
-            fieldToHash: {value: "payload"},
-            fieldTypeToHash: {value: "msg"},
-            hashField: {value: "md5"},
-            hashFieldType: {value: "msg"}
+            plan: {value: ""},
+            triggerMode: {value: ""} //todo
+        },
+        icon: "md5.png",
+        inputs: 1,
+        outputs: 1,
+    });
+</script>
+
+<script type="text/html" data-template-name="Plan">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> 名称</label>
+        <input type="text" id="node-input-name" placeholder="名称">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-plan"><i class="fa fa-align-justify"></i> 字符串</label>
+        <input type="text" id="node-input-plan" placeholder="Hello World～">
+    </div>
+
+
+    <div class="form-tips">
+        <i class="fa fa-bell"></i>
+        <b> 说明:</b> 如果想要换行输入"\n "即可
+    </div>
+
+
+</script>
+
+<script type="text/x-red" data-help-name="Plan">
+   <p>获取信息函数</p>
+
+
+
+
+
+
+
+
+</script>
+
+
+<!--#FDF0C2-->
+
+<script type="text/javascript">
+    // 触发器函数
+    RED.nodes.registerType('Trigger', {
+        category: 'easyMirai',
+        color: '#FDF0C2',
+        defaults: {
+            name: {value: ""},
+            conditionMode: {value: "FriendMessage"},
+            CustomizationType: {value: ""},
         },
         icon: "md5.png",
         inputs: 1,
         outputs: 1,
         oneditprepare: function () {
-            if (!this.fieldTypeToHash) {
-                this.fieldTypeToHash = 'msg';
-            }
-            $("#node-input-fieldToHash").typedInput({
-                default: 'msg',
-                types: ['msg', 'flow', 'global'],
-                typeField: $("#node-input-fieldTypeToHash")
-            });
-            $("#node-input-useAuth").change(function () {
-                if ($(this).is(":checked")) {
-                    $(".node-input-useAuth-row").show();
+            $("#node-input-conditionMode").on("change", function () {
+                if ($(this).val() === "Customization") {
+                    $(".form-row-conditionMode").show();
+                    $(".form-row-other").hide();
                 } else {
-                    $(".node-input-useAuth-row").hide();
-                    $('#node-input-user').val('');
+                    $(".form-row-conditionMode").hide();
+                    $(".form-row-other").show();
                 }
-            });
-            if (this.credentials.user) {
-                $('#node-input-useAuth').prop('checked', true);
-            } else {
-                $('#node-input-useAuth').prop('checked', false);
-            }
-            $("#node-input-useAuth").change();
-
-
-            $("#node-input-rule-container").css('min-height', '150px').css('min-width', '450px').editableList({})
-
-            // 这里
+            }).change();
         }
     });
 </script>
 
-<script type="text/html" data-template-name="Text">
+<script type="text/html" data-template-name="Trigger">
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
+        <label for="node-input-name"><i class="fa fa-tag"></i> 名称</label>
+        <input type="text" id="node-input-name" placeholder="名称">
     </div>
 
-    <div class="form-row">
-        <label for="node-input-fieldToHash"><i class="fa fa-edit"></i> Property to Hash</label>
-        <input type="text" id="node-input-fieldToHash" placeholder="Property to Hash" style="width:250px;">
-        <input type="hidden" id="node-input-fieldTypeToHash">
-        <div class="form-tips"><b>Tip:</b><br>ac<br>ab</div>
-    </div>
 
     <div class="form-row">
-        <input type="checkbox" id="node-input-useAuth" style="display: inline-block; width: auto; vertical-align: top;">
-        <label for="node-input-useAuth" style="width: 70%;">转发消息</label>
-        <div style="margin-left: 20px" class="node-input-useAuth-row hide">
-            <div class="form-row">
-                <label for="node-input-user"><i class="fa fa-user"></i> 发送时转发给</span></label>
-                <!--转发目标-->
-                <input type="text" id="node-input-forward-user">
-            </div>
-            <div class="form-tips"><b><i class="fa fa-bell"></i> 说明:</b> 发送消息的时同时也给另一个人，这个人必须是机器人可以正常聊天的好友
-            </div>
-        </div>
+        <label for="node-input-conditionMode"><i class="fa fa-tasks"></i> 消息类型</label>
+        <select type="text" id="node-input-conditionMode" style="width:70%;">
+            <option value="FriendMessage">好友消息</option>
+            <option value="GroupMessage">群消息</option>
+            <option value="TempMessage">群临时消息</option>
+            <option value="StrangerMessage">陌生人消息</option>
+            <option value="OtherClientMessage">其他客户端消息</option>
+            <option value="CountMessage">队列大小</option>
+            <option value="Customization">自定义</option>
+        </select>
     </div>
-    <!--这里！-->
-    <div class="form-row node-input-rule-container-row">
-        <ol id="node-input-rule-container"></ol>
+
+    <div class="form-tips form-row-other">
+        <i class="fa fa-bell"></i>
+        <b> 说明:</b> 选择可以通过的消息类型！
+    </div>
+
+    <div class="form-row form-row-conditionMode hide">
+        <label for="node-input-CustomizationType"><i class="fa fa-external-link-square" aria-hidden="true"></i>
+            类型</label>
+        <input type="text" id="node-input-CustomizationType">
+    </div>
+
+    <div class="form-tips form-row-conditionMode hide">
+        <i class="fa fa-bell"></i>
+        <b> 说明:</b> 自定义可以通过的消息类型！
     </div>
 
 
 </script>
 
-<script type="text/x-red" data-help-name="Text">
-   <p>发送信息函数</p>
+<script type="text/x-red" data-help-name="Trigger">
+   <p>提取文本信息</p>
+
+
+
+
+
 
 
 

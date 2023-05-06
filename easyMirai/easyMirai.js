@@ -51,6 +51,8 @@ module.exports = function (RED) {
                             shape: "ring",
                             text: "未知错误"
                         });
+                        msg.payload = session;
+                        node.send(msg)
                     }
                 } else {
                     msg.payload = body;
@@ -138,21 +140,23 @@ module.exports = function (RED) {
             if (global.get("miraiStatus") === true) {
                 // 主执行程序代码块
                 let uri;
+                let mode;
                 if (getMode === "count") {
                     // 获取队列大小
                     uri = "/countMessage?sessionKey=" + global.get("miraiSession");
+                    mode = "count"
                 } else if (getMode === "fetch") {
                     // 获取队列头部
-                    uri = "/fetchMessage?sessionKey=" + global.get("miraiSession")+"&count=" + n.count;
+                    uri = "/fetchMessage?sessionKey=" + global.get("miraiSession") + "&count=" + n.count;
                 } else if (getMode === "fetchLatest") {
                     // 获取队列尾部
-                    uri = "/fetchLatestMessage?sessionKey=" + global.get("miraiSession")+"&count=" + n.count;
+                    uri = "/fetchLatestMessage?sessionKey=" + global.get("miraiSession") + "&count=" + n.count;
                 } else if (getMode === "peek") {
                     // 查看队列头部
-                    uri = "/peekMessage?sessionKey=" + global.get("miraiSession")+"&count=" + n.count;
+                    uri = "/peekMessage?sessionKey=" + global.get("miraiSession") + "&count=" + n.count;
                 } else if (getMode === "peekLatest") {
                     // 查看队列尾部
-                    uri = "/peekLatestMessage?sessionKey=" + global.get("miraiSession")+"&count=" + n.count;
+                    uri = "/peekLatestMessage?sessionKey=" + global.get("miraiSession") + "&count=" + n.count;
                 } else {
                     // 自定义
 
@@ -190,7 +194,20 @@ module.exports = function (RED) {
                     } else {
                         msg.payload = body;
                         msg.payload = msg.payload.toString('utf8');
-                        msg.payload = JSON.parse(msg.payload).data;
+                        msg.payload = JSON.parse(msg.payload);
+                        if (mode === "count") {
+                            msg.payload =
+                                [
+                                    {
+                                        "type": "CountMessage",
+                                        "count": msg.payload.data
+                                    }
+                                ]
+
+                        } else {
+                            msg.data = msg.payload;
+                            msg.payload = msg.payload.data;
+                        }
                         node.send(msg);
                     }
                 })
@@ -200,7 +217,22 @@ module.exports = function (RED) {
         });
     }
 
-    function easyMiraiText(n) {
+    function easyMiraiPlan(n) {
+        // 发送文本编码
+        RED.nodes.createNode(this, n);
+        let node = this;
+        let global = node.context().global;
+
+
+        node.on('input', function (msg) {
+            var hash = RED.util.evaluateNodeProperty("payload", "msg", node, msg); // 获取某个值 hash = msg.payload;
+            RED.util.setMessageProperty(msg,"payload",hash); // msg.payload = hash;
+            node.send(msg)
+        });
+
+    }
+
+    function easyMiraiSendMessage(n) {
         // 发送文本编码
         RED.nodes.createNode(this, n);
         let node = this;
@@ -212,10 +244,27 @@ module.exports = function (RED) {
 
     }
 
+    function easyMiraiTrigger(n) {
+        // 发送文本编码
+        RED.nodes.createNode(this, n);
+        let node = this;
+        let global = node.context().global;
+
+        node.on('input', function (msg) {
+            if (msg.payload.type === n.conditionMode) {
+                node.send(msg)
+            } else if (n.conditionMode === "Customization" && msg.payload.type === n.CustomizationType) {
+                node.send(msg)
+            }
+        });
+
+    }
 
     RED.nodes.registerType("Mirai", easyMiraiMirai); // 绑定到节点
     RED.nodes.registerType("Get Message", easyMiraiGetMessage); // 绑定到节点
-    RED.nodes.registerType("Text", easyMiraiText);
+    RED.nodes.registerType("Plan", easyMiraiPlan);
+    RED.nodes.registerType("Send Message", easyMiraiSendMessage);
+    RED.nodes.registerType("Trigger", easyMiraiTrigger);
 
 }
 
