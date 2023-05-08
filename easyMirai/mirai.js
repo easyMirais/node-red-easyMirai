@@ -1,4 +1,3 @@
-const request = require("request");
 module.exports = function (RED) {
     let request = require('request');
     const config = {
@@ -43,6 +42,7 @@ module.exports = function (RED) {
                         body = JSON.parse(body);
                         if (body.code === 0) {
                             msg.payload = body;
+                            global.set("miraiSession", body.session)
                             node.status({fill: "green", shape: "dot", text: "配置节点完成"});
                         } else {
                             msg.payload = {
@@ -70,11 +70,12 @@ module.exports = function (RED) {
             })
 
             data = {
-                "verifyKey": global.get("miraiKey")
+                "sessionKey": global.get("miraiSession"),
+                "qq": global.get("miraiId")
             }
             data = {
                 method: "POST",
-                url: 'http://' + global.get("miraiHost") + ':' + global.get("miraiPort") + config.verify,
+                url: 'http://' + global.get("miraiHost") + ':' + global.get("miraiPort") + config.bind,
                 body: JSON.stringify(data) // 转成String格式
             }
             request(data, function (error, response, body) {
@@ -85,7 +86,8 @@ module.exports = function (RED) {
                         body = JSON.parse(body);
                         if (body.code === 0) {
                             msg.payload = body;
-                            node.status({fill: "green", shape: "dot", text: "配置节点完成"});
+                            global.set("miraiInit", true);
+                            node.status({fill: "green", shape: "dot", text: "初始化完成"});
                         } else {
                             msg.payload = {
                                 "code": body.code,
@@ -121,4 +123,7 @@ module.exports = function (RED) {
 
     RED.nodes.registerType("Mirai", mirai); // 绑定到节点
 }
+
+
+
 
