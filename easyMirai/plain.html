@@ -1,0 +1,63 @@
+<script type="text/javascript">
+    // 获取信息通信函数
+    RED.nodes.registerType('Plain', {
+        category: 'easyMirai',
+        color: '#5ccefa',
+        defaults: {
+            name: {value: ""},
+            plan: {value: ""},
+            conditionMode: {value: "customization"},
+            target: {value: 0}
+        },
+        icon: "md5.png",
+        inputs: 1,
+        outputs: 1,
+        oneditprepare: function () {
+            $("#node-input-conditionMode").change(function () {
+                if ($("#node-input-conditionMode").val() === "customization") {
+                    $("#tip-json").show();
+                } else {
+                    $("#tip-json").hide();
+                }
+            });
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="Plain">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> 名称</label>
+        <input type="text" id="node-input-name" placeholder="名称">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-plan"><i class="fa fa-align-justify"></i> 字符串</label>
+        <input type="text" id="node-input-plan" placeholder="Hello World～">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-conditionMode"><i class="fa fa-tasks"></i> 消息类型</label>
+        <select type="text" id="node-input-conditionMode" style="width:70%;">
+            <option value="customization">自定义</option>
+            <option value="source">根据 -msg.target- 定义</option>
+        </select>
+    </div>
+
+
+    <div class="form-row" id="tip-json">
+        <label for="node-input-target"><i class="fa fa-align-justify"></i> 发送给</label>
+        <input type="text" id="node-input-target" placeholder="BotID">
+    </div>
+
+
+    <div class="form-tips">
+        <i class="fa fa-bell"></i>
+        <b> 说明:</b> 如果想要换行输入"\n "即可
+    </div>
+
+
+</script>
+
+<script type="text/x-red" data-help-name="Plain">
+   <p>获取信息函数</p>
+</script>

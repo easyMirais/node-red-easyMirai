@@ -26,7 +26,8 @@
   },
   "node-red": {
     "nodes": {
-      "mirai": "easyMirai/mirai.js"
+      "mirai": "easyMirai/mirai.js",
+      "plain": "easyMirai/plain.js"
     }
   }
 }
