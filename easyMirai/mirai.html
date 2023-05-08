@@ -1,0 +1,74 @@
+<script type="text/javascript">
+    // 初始化函数
+    RED.nodes.registerType('Mirai', {
+        category: 'easyMirai',
+        color: '#f6a8b7',
+        defaults: {
+            name: {value: ""},
+            miraiHost: {value: "127.0.0.1"},
+            miraiPort: {value: "8080"},
+            miraiKey: {value: ""},
+            miraiId: {value: ""},
+            miraiDebug: {value: true},
+            hashFieldType: {value: "msg"}
+        },
+        inputs: 0,
+        outputs: 1,
+        outputLabels: "Mirai输出已绑定参数(可选)",
+        icon: "md5.png",
+        label: function () {
+            return this.name || "Mirai";
+        },
+        oneditprepare: function () {
+
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="Mirai">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> 名称</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-miraiHost"><i class="fa fa-globe"></i> Mirai地址</label>
+        <input type="text" id="node-input-miraiHost" placeholder="127.0.0.1" style="width:45%;">
+        <span>端口</span>
+        <input type="text" id="node-input-miraiPort" style="width:80px;">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-miraiId"><i class="fa fa-tag"></i> 机器人账号</label>
+        <input type="text" id="node-input-miraiId">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-miraiKey"><i class="fa fa-key"></i> 认证密钥</label>
+        <input type="text" id="node-input-miraiKey">
+    </div>
+
+    <div class="form-tips"><b><i class="fa fa-bell"></i> 注意:</b> 认证密钥需要在Config里设置</div>
+
+    <br>
+
+    <div class="form-row">
+        <input type="checkbox" id="node-input-miraiDebug"
+               style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-input-miraiDebug" style="width: auto">启用日志输出(建议开发时开启)</label>
+    </div>
+
+
+</script>
+
+<script type="text/x-red" data-help-name="Mirai">
+    <p>初始化Mirai服务</p>
+
+
+
+
+
+
+
+
+
+</script>

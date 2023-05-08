@@ -31,41 +31,26 @@ module.exports = function (RED) {
                 body: '{"verifyKey": "' + global.get("miraiKey") + '"}'
             };
             request(verify, function (error, response, body) {
-                if (error) {
-                    if (error.code === 'ETIMEDOUT') {
-                        node.status({
-                            fill: "yellow",
-                            shape: "ring",
-                            text: "连接超时"
-                        });
 
-                    } else if (error.code === 'ECONNREFUSED') {
-                        node.status({
-                            fill: "red",
-                            shape: "ring",
-                            text: "服务地址不存在"
-                        });
-                    } else {
-                        node.status({
-                            fill: "red",
-                            shape: "ring",
-                            text: "未知错误"
-                        });
-                        msg.payload = session;
+                // node.status({
+                //     fill: "yellow",
+                //     shape: "ring",
+                //     text: "连接超时"
+                // });
+                if (~error) {
+                    if (response.statusCode === 200) {
+                        msg.payload = body.toString();
+                        msg.payload = JSON.parse(msg.payload);
                         node.send(msg)
+                        global.set("miraiSession", msg.payload.session);
+                        // node.send(msg)
+                        node.log(response.statusCode)
+                        node.status({
+                            fill: "green",
+                            shape: "dot",
+                            text: "服务器连接成功"
+                        });
                     }
-                } else {
-                    msg.payload = body;
-                    msg.payload = msg.payload.toString('utf8');
-                    msg.payload = JSON.parse(msg.payload);
-                    // node.send(msg)
-                    global.set("miraiSession", msg.payload.session);
-                    node.status({
-                        fill: "green",
-                        shape: "dot",
-                        text: "服务器连接成功"
-                    });
-
                 }
             })
 
@@ -76,8 +61,10 @@ module.exports = function (RED) {
                 url: 'http://' + n.miraiHost + ':' + n.miraiPort + "/bind", // 组合地址
                 headers: {},
                 encoding: null,
-                body: '{"sessionKey": "' + global.get("miraiSession") + '","qq": ' + global.get("miraiKey") + '}',
+                body: '{"sessionKey": "' + global.get("miraiSession") + '","qq": ' + global.get("miraiId") + '}',
             };
+            // msg.payload = session
+            // node.error(session)
             request(session, function (error, response, body) {
                 if (error) {
                     if (error.code === 'ETIMEDOUT') {
@@ -104,6 +91,8 @@ module.exports = function (RED) {
                     msg.payload = body;
                     msg.payload = msg.payload.toString('utf8');
                     msg.payload = JSON.parse(msg.payload);
+                    node.error(msg.payload + "绑定")
+                    // node.send(msg)
                     node.status({
                         fill: "green",
                         shape: "dot",
@@ -195,19 +184,20 @@ module.exports = function (RED) {
                         msg.payload = body;
                         msg.payload = msg.payload.toString('utf8');
                         msg.payload = JSON.parse(msg.payload);
-                        if (mode === "count") {
-                            msg.payload =
-                                [
-                                    {
-                                        "type": "CountMessage",
-                                        "count": msg.payload.data
-                                    }
-                                ]
-
-                        } else {
-                            msg.data = msg.payload;
-                            msg.payload = msg.payload.data;
-                        }
+                        // node.send(msg)
+                        // if (mode === "count") {
+                        //     msg.payload =
+                        //         [
+                        //             {
+                        //                 "type": "CountMessage",
+                        //                 "count": msg.payload.data
+                        //             }
+                        //         ]
+                        //
+                        // } else {
+                        //     msg.data = msg.payload;
+                        //     msg.payload = msg.payload.data;
+                        // }
                         node.send(msg);
                     }
                 })
@@ -225,8 +215,14 @@ module.exports = function (RED) {
 
 
         node.on('input', function (msg) {
-            var hash = RED.util.evaluateNodeProperty("payload", "msg", node, msg); // 获取某个值 hash = msg.payload;
-            RED.util.setMessageProperty(msg,"payload",hash); // msg.payload = hash;
+            // var hash = RED.util.evaluateNodeProperty("payload", "msg", node, msg); // 获取某个值 hash = msg.payload;
+            // RED.util.setMessageProperty(msg,"payload",hash); // msg.payload = hash;
+            msg.payload = n;
+            if (~n.plan.indexOf("{{")) {
+                node.log(n.plan.slice(n.plan.indexOf("{{") + 2, n.plan.indexOf("}}"))) // 截取花括号里的文字
+
+            }
+            // node.error((~n.plan.indexOf("{{"))? 1 : 2)
             node.send(msg)
         });
 

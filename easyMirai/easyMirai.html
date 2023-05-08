@@ -228,6 +228,7 @@
         icon: "md5.png",
         inputs: 1,
         outputs: 1,
+        plan:function() { return (~this.plan.indexOf("{{") ? null : this.plan); }
     });
 </script>
 
@@ -253,14 +254,6 @@
 
 <script type="text/x-red" data-help-name="Plan">
    <p>获取信息函数</p>
-
-
-
-
-
-
-
-
 </script>
 
 
